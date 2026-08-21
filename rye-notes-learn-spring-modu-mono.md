@@ -139,6 +139,68 @@ Request → Controller → Service → Repository → Database
 - Dengan rate limiter: request ke-6 dalam 1 menit → 429 Too Many Requests
 - Library: Bucket4j (simpel, pure rate limiting) atau Resilience4j (lebih lengkap)
 - Cara kerja: setiap IP dapat "bucket" berisi N token, tiap request ambil 1 token, kalau habis → 429
+- Kelemahan implementasi in-memory: reset saat app restart, tidak efektif di multi-instance
+- Solusi production: simpan bucket di Redis supaya persistent dan shared antar instance
+
+### JWT (JSON Web Token)
+- Terdiri dari 3 bagian: `header.payload.signature`
+- `header` = algoritma enkripsi
+- `payload` = data user (id, email, role, expiry)
+- `signature` = tanda tangan untuk validasi token tidak dimanipulasi
+- Stateless — server tidak perlu simpan token, cukup validasi signature
+- Access token expiry pendek (15 menit) untuk keamanan
+- JWT secret harus random string minimal 256-bit di production
+
+### Spring Security Filter Chain
+- Request masuk → melewati serangkaian filter sebelum sampai ke Controller
+- Urutan filter penting — rate limit harus sebelum JWT validation
+- `addFilterBefore(filter, beforeFilter)` = jalankan `filter` sebelum `beforeFilter`
+- `OncePerRequestFilter` = filter yang hanya dieksekusi sekali per request
+- Filter yang kita buat:
+  - `RateLimitFilter` → cek rate limit per IP
+  - `JwtAuthFilter` → validasi JWT token
+
+### GitHub Actions CI/CD
+- Workflow disimpan di `.github/workflows/*.yml` di root repo
+- `on: push: branches: [main]` — pipeline trigger saat push ke branch main
+- `permissions: packages: write` — izin untuk push image ke GitHub Container Registry (ghcr.io)
+- `actions/checkout@v4` — clone repo ke runner
+- `actions/setup-java@v4` dengan `cache: maven` — setup JDK + cache dependency Maven supaya build lebih cepat
+- `docker/login-action` — login ke ghcr.io pakai `GHCR_TOKEN` secret
+- `docker/build-push-action` — build Dockerfile dan push image ke ghcr.io
+- Image tersimpan di `ghcr.io/<username>/<repo-name>:latest`
+- `RENDER_DEPLOY_HOOK_URL` — URL webhook dari Render, dipanggil dengan curl untuk trigger redeploy otomatis
+- Secrets disimpan di GitHub repo → Settings → Secrets and variables → Actions
+- `.github/workflows/` harus ada di root repo — GitHub tidak akan baca kalau ada di subfolder
+
+### Dockerfile Multi-Stage Build
+- Dockerfile bisa punya beberapa stage, masing-masing pakai base image berbeda
+- **Stage 1 (builder)**: pakai `maven:3.9-eclipse-temurin-21-alpine` — compile + package JAR
+- **Stage 2 (runner)**: pakai `eclipse-temurin:21-jre-alpine` — hanya JRE, copy JAR dari stage 1
+- Hasilnya: image production kecil, tidak ada Maven, tidak ada source code
+- `COPY --from=builder` = ambil file dari stage sebelumnya
+- `RUN mvn dependency:go-offline` dulu sebelum copy src — supaya layer cache Maven tidak invalid setiap kode berubah
+- `ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]` — pakai shell supaya env var `$JAVA_OPTS` bisa dibaca
+
+### Docker Layer Caching
+- Docker build bekerja layer per layer, setiap instruksi = 1 layer
+- Layer di-cache — kalau tidak ada perubahan, Docker pakai cache (lebih cepat)
+- Urutan instruksi penting: taruh yang jarang berubah di atas, yang sering berubah di bawah
+- `COPY pom.xml` → `RUN mvn dependency:go-offline` → `COPY src` → `RUN mvn package`
+- Kalau hanya src yang berubah, layer dependency tidak perlu di-rebuild
+
+### docker-compose dev vs prod
+- `docker-compose.dev.yml` — untuk lokal: ada Postgres container + app, pakai profile dev
+- `docker-compose.prod.yml` — untuk production: hanya app, DB dari env var eksternal (Supabase)
+- Jalankan dev: `docker compose -f docker-compose.dev.yml up`
+- `depends_on: condition: service_healthy` — app tidak start sebelum Postgres benar-benar siap
+- Di prod, tidak ada Postgres container — DB dihandle Supabase, cukup set `DB_URL` env var
+
+### OOP — Parameter vs Field/Property
+- **Field/Property** = variabel milik class, dideklarasikan di dalam class
+- **Parameter** = nilai yang dikirim saat memanggil method, ada di dalam `()`
+- **Argument** = nilai aktual yang dikirim saat method dipanggil
+- **Method chaining** = memanggil method berantai pada object yang sama
 
 ---
 
@@ -146,9 +208,9 @@ Request → Controller → Service → Repository → Database
 
 - [x] Step 1 — Project setup
 - [x] Step 2 — Module User (Entity, Repository, Service, Controller, DTO, Mapper)
-- [ ] Step 3 — Spring Security + JWT
-- [ ] Step 4 — Swagger / OpenAPI docs
-- [ ] Step 5 — Testing (unit + integration)
-- [ ] Step 6 — Dockerfile + Docker Compose production
-- [ ] Step 7 — GitHub Actions CI/CD
+- [x] Step 3 — Spring Security + JWT + Refresh Token + Rate Limiting
+- [x] Step 4 — Swagger / OpenAPI docs
+- [x] Step 5 — Testing (unit + integration)
+- [x] Step 6 — Dockerfile + Docker Compose production
+- [x] Step 7 — GitHub Actions CI/CD
 - [ ] Step 8 — Deploy ke Render + koneksi Supabase

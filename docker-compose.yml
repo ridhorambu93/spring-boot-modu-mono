@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: boilerplate-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-boilerplate_db}
+      POSTGRES_USER: ${DB_USER:-boilerplate_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-boilerplate_pass}
+      POSTGRES_HOST_AUTH_METHOD: md5
+      POSTGRES_INITDB_ARGS: "--auth-host=md5 --auth-local=md5"
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-boilerplate_user} -d ${DB_NAME:-boilerplate_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

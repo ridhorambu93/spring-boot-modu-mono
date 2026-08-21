@@ -118,6 +118,30 @@ Request → Controller → Service → Repository → Database
 
 ---
 
+### Refresh Token
+- Solusi untuk access token yang expired tanpa harus login ulang
+- Dua token: access token (expiry pendek, 15 menit) + refresh token (expiry panjang, 7 hari)
+- Access token → dipakai untuk akses endpoint
+- Refresh token → hanya dipakai untuk minta access token baru
+- Alur:
+  1. Login → dapat access token + refresh token
+  2. Akses endpoint pakai access token
+  3. Access token expired → kirim refresh token ke POST /auth/refresh
+  4. Server validasi refresh token → kasih access token baru
+  5. Refresh token expired → user harus login ulang
+- Simpan refresh token di database supaya bisa di-revoke (logout, suspicious activity)
+- Kalau pakai Redis nanti bisa lebih cepat, tapi butuh infrastruktur tambahan
+
+### Rate Limiting
+- Pembatas jumlah request dalam rentang waktu tertentu
+- Penting di auth endpoint untuk mencegah brute force attack
+- Tanpa rate limiter, attacker bisa coba password jutaan kali secara otomatis
+- Dengan rate limiter: request ke-6 dalam 1 menit → 429 Too Many Requests
+- Library: Bucket4j (simpel, pure rate limiting) atau Resilience4j (lebih lengkap)
+- Cara kerja: setiap IP dapat "bucket" berisi N token, tiap request ambil 1 token, kalau habis → 429
+
+---
+
 ## Roadmap
 
 - [x] Step 1 — Project setup

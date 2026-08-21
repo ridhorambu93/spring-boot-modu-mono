@@ -12,6 +12,7 @@ target/
 
 # Environment
 .env
+application-dev.yml
 
 # Logs
 *.log

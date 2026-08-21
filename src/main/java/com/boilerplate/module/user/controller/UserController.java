@@ -6,6 +6,7 @@ import com.boilerplate.shared.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 
 import java.util.UUID;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,4 +23,11 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserResponse>> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.ok(userService.findById(id)));
     }
+
+    @GetMapping("/pofile")
+    public ResponseEntity<ApiResponse<UserResponse>> me(Authentication authentication) {
+    UUID userId = UUID.fromString(authentication.getName());
+    return ResponseEntity.ok(ApiResponse.ok(userService.findById(userId)));
+}
+
 }

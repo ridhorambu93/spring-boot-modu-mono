@@ -38,5 +38,5 @@ springdoc:
 app:
   jwt:
     secret: ${JWT_SECRET:default-secret-change-in-production-min-256-bit}
-    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+    expiration-ms: ${JWT_EXPIRATION_MS:120000}
     refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}

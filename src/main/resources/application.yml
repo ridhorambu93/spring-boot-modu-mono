@@ -2,8 +2,7 @@ spring:
   application:
     name: spring-service-modular-monolith
   profiles:
-    # active: ${APP_ENV:dev}
-    active: dev
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   jpa:
     hibernate:
       ddl-auto: validate

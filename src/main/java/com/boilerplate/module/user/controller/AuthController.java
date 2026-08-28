@@ -1,9 +1,9 @@
 package com.boilerplate.module.user.controller;
 
-import com.boilerplate.module.user.dto.AuthResponse;
-import com.boilerplate.module.user.dto.LoginRequest;
-import com.boilerplate.module.user.dto.RefreshTokenRequest;
-import com.boilerplate.module.user.dto.RegisterRequest;
+import com.boilerplate.module.user.domain.dto.AuthResponse;
+import com.boilerplate.module.user.domain.dto.LoginRequest;
+import com.boilerplate.module.user.domain.dto.RefreshTokenRequest;
+import com.boilerplate.module.user.domain.dto.RegisterRequest;
 import com.boilerplate.module.user.service.AuthService;
 import com.boilerplate.shared.response.ApiResponse;
 import jakarta.validation.Valid;

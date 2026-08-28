@@ -1,4 +1,4 @@
-package com.boilerplate.module.user.dto;
+package com.boilerplate.module.user.domain.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

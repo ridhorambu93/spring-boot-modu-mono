@@ -1,6 +1,7 @@
-package com.boilerplate.module.user.dto;
+package com.boilerplate.module.user.domain.dto;
 
 import com.boilerplate.module.user.entity.User;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -10,4 +11,4 @@ public record UserResponse(
     String name,
     User.Role role,
     Instant createdAt
-){}
+) {}

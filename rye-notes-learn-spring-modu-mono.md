@@ -214,3 +214,64 @@ Request → Controller → Service → Repository → Database
 - [x] Step 6 — Dockerfile + Docker Compose production
 - [x] Step 7 — GitHub Actions CI/CD
 - [ ] Step 8 — Deploy ke Render + koneksi Supabase
+
+---
+
+## Refactor Modul User — Service Interface + Impl Pattern
+
+### Apa yang diubah
+
+1. **BaseEntity** — tambah field `deletedAt` untuk soft delete support di semua modul
+2. **DTO dipindah** dari `module/user/dto/` ke `module/user/domain/dto/` — mengikuti pola `domain/` yang mengelompokkan dto bersama
+3. **Service dipecah** jadi interface + impl:
+   - `UserService` (interface) + `UserServiceImpl` (impl)
+   - `AuthService` (interface) + `AuthServiceImpl` (impl)
+   - `RefreshTokenService` (interface) + `RefreshTokenServiceImpl` (impl)
+4. **`api/` folder** ditambahkan — berisi `UserApi.java` sebagai public interface modul user
+5. **Fix typo** `/pofile` → `/profile` di `UserController`
+
+### Kenapa Service harus Interface + Impl?
+
+- Controller inject interface, bukan concrete class
+- Kalau implementasi berubah (misal tambah caching, ganti logic), controller tidak perlu diubah
+- Memudahkan unit test — bisa mock interface tanpa load Spring context
+- Konsisten dengan pola yang dipakai di project referensi (SAT)
+
+### Struktur Akhir Modul User
+
+```
+module/user/
+├── api/
+│   └── UserApi.java              ← public interface untuk modul lain
+├── controller/
+│   ├── AuthController.java
+│   └── UserController.java
+├── domain/
+│   └── dto/
+│       ├── AuthResponse.java
+│       ├── LoginRequest.java
+│       ├── RefreshTokenRequest.java
+│       ├── RegisterRequest.java
+│       └── UserResponse.java
+├── entity/
+│   ├── RefreshToken.java
+│   └── User.java
+├── mapper/
+│   └── UserMapper.java
+├── repository/
+│   ├── RefreshTokenRepository.java
+│   └── UserRepository.java
+└── service/
+    ├── AuthService.java           ← interface
+    ├── AuthServiceImpl.java       ← implementasi
+    ├── RefreshTokenService.java   ← interface
+    ├── RefreshTokenServiceImpl.java
+    ├── UserService.java           ← interface
+    └── UserServiceImpl.java       ← implements UserService + UserApi
+```
+
+### Aturan Dependency
+
+- Controller → inject **interface** (UserService, AuthService)
+- Modul lain → inject **UserApi** (bukan UserService)
+- Tidak ada modul yang boleh import langsung ke `*ServiceImpl`

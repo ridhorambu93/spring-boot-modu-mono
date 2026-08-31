@@ -1,6 +1,6 @@
-# Spring Boot Modular Monolith Boilerplate
+# Spring Boot Simple Modular Monolith Boilerplate
 
-Production-ready Spring Boot boilerplate with modular monolith architecture.
+Spring Boot simple boilerplate with modular monolith architecture.
 
 ## Tech Stack
 
@@ -36,7 +36,7 @@ cp .env.example .env
 # Edit .env sesuai kebutuhan
 ```
 
-### 2. Jalankan Postgres via Docker
+### 2. Jalankan Postgres via Docker (optional | bisa docker bisa yg sudah terinstall pada pc / laptop)
 
 ```bash
 docker compose up -d
@@ -56,12 +56,37 @@ http://localhost:8080/swagger-ui.html
 
 ## API Endpoints
 
+### Auth
 | Method | Path | Description |
 |--------|------|-------------|
 | POST | /api/v1/auth/register | Register user baru |
 | POST | /api/v1/auth/login | Login & dapat JWT |
 | POST | /api/v1/auth/refresh | Refresh access token |
-| GET | /api/v1/users/me | Get current user profile |
+| POST | /api/v1/auth/logout | Logout & revoke refresh token |
+
+### User
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | /api/v1/users/profile | Get current user profile |
+| GET | /api/v1/users/{id} | Get user by ID |
+
+### Masterdata - Province ( role : Admin)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | /api/v1/masterdata/provinces | Get all provinces |
+| GET | /api/v1/masterdata/provinces/{id} | Get province by ID |
+| POST | /api/v1/masterdata/provinces | Create province |
+| PUT | /api/v1/masterdata/provinces/{id} | Update province |
+| DELETE | /api/v1/masterdata/provinces/{id} | Soft delete province |
+
+### Masterdata - City (role : Admin)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | /api/v1/masterdata/cities | Get all cities (optional: ?provinceId=) |
+| GET | /api/v1/masterdata/cities/{id} | Get city by ID |
+| POST | /api/v1/masterdata/cities | Create city |
+| PUT | /api/v1/masterdata/cities/{id} | Update city |
+| DELETE | /api/v1/masterdata/cities/{id} | Soft delete city |
 
 ## Environment Variables
 
@@ -73,4 +98,4 @@ Lihat `.env.example` untuk daftar lengkap environment variables yang dibutuhkan.
 ./mvnw test
 ```
 
-> Integration test menggunakan Testcontainers, pastikan Docker Desktop berjalan.
+## fyi : Integration test menggunakan Testcontainers, pastikan Docker Desktop berjalan.

@@ -15,9 +15,9 @@ public class OpenApiConfig {
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Spring Boot Modular Monolith API")
+                        .title("Spring Boot Simnple Modular Monolith API")
                         .version("1.0.0")
-                        .description("Boilerplate API Documentation"))
+                        .description("API Documentation"))
                 .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
                 .components(new Components()
                         .addSecuritySchemes("Bearer Authentication", new SecurityScheme()

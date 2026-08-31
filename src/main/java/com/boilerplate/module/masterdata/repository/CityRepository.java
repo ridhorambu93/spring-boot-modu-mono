@@ -12,4 +12,5 @@ public interface CityRepository extends JpaRepository<City, UUID> {
     List<City> findAllByProvinceIdAndDeletedAtIsNull(UUID provinceId);
     Optional<City> findByIdAndDeletedAtIsNull(UUID id);
     boolean existsByCodeAndDeletedAtIsNull(String code);
+    boolean existsByProvinceIdAndDeletedAtIsNull(UUID provinceId);
 }

@@ -10,6 +10,7 @@
         <version>3.4.1</version>
         <relativePath/>
     </parent>
+    
 
     <groupId>com.boilerplate</groupId>
     <artifactId>spring-service-modular-monolith</artifactId>
@@ -146,6 +147,7 @@
 
     <build>
         <plugins>
+        <!-- versioning -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

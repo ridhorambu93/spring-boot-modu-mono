@@ -1,5 +1,6 @@
 package com.boilerplate.module.masterdata.service;
 
+import com.boilerplate.module.masterdata.api.CityApi;
 import com.boilerplate.module.masterdata.dto.CityRequest;
 import com.boilerplate.module.masterdata.dto.CityResponse;
 import com.boilerplate.module.masterdata.entity.City;
@@ -16,7 +17,12 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class CityServiceImpl implements CityService {
+public class CityServiceImpl implements CityService, CityApi {
+
+    @Override
+    public boolean existsById(UUID id) {
+        return cityRepository.findByIdAndDeletedAtIsNull(id).isPresent();
+    }
 
     private final CityRepository cityRepository;
     private final ProvinceRepository provinceRepository;

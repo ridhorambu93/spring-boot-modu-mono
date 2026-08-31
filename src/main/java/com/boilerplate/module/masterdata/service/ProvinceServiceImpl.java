@@ -1,9 +1,11 @@
 package com.boilerplate.module.masterdata.service;
 
+import com.boilerplate.module.masterdata.api.ProvinceApi;
 import com.boilerplate.module.masterdata.dto.ProvinceRequest;
 import com.boilerplate.module.masterdata.dto.ProvinceResponse;
 import com.boilerplate.module.masterdata.entity.Province;
 import com.boilerplate.module.masterdata.mapper.MasterdataMapper;
+import com.boilerplate.module.masterdata.repository.CityRepository;
 import com.boilerplate.module.masterdata.repository.ProvinceRepository;
 import com.boilerplate.shared.exception.AppException;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +17,15 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class ProvinceServiceImpl implements ProvinceService {
+public class ProvinceServiceImpl implements ProvinceService, ProvinceApi {
+
+    @Override
+    public boolean existsById(UUID id) {
+        return provinceRepository.findByIdAndDeletedAtIsNull(id).isPresent();
+    }
 
     private final ProvinceRepository provinceRepository;
+    private final CityRepository cityRepository;
     private final MasterdataMapper masterdataMapper;
 
     @Override
@@ -58,6 +66,8 @@ public class ProvinceServiceImpl implements ProvinceService {
     public void delete(UUID id) {
         Province province = provinceRepository.findByIdAndDeletedAtIsNull(id)
             .orElseThrow(() -> AppException.notFound("Province not found"));
+        if (cityRepository.existsByProvinceIdAndDeletedAtIsNull(id))
+            throw AppException.badRequest("Province still has active cities");
         province.setDeletedAt(Instant.now());
         provinceRepository.save(province);
     }

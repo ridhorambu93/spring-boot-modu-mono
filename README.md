@@ -1,18 +1,17 @@
 # Spring Boot Simple Modular Monolith Boilerplate
 
-Spring Boot simple boilerplate with modular monolith architecture.
+Simple Boilerplate Spring Boot dengan arsitektur modular monolith
 
 ## Tech Stack
 
 - Java 21 + Spring Boot 3.4.x
-- PostgreSQL + Flyway (migrations)
+- PostgreSQL + Flyway
 - Spring Security + JWT
 - MapStruct + Lombok
 - Springdoc OpenAPI (Swagger)
-- Testcontainers (integration tests)
-- Docker + Docker Compose
+- Docker + Docker Compose (opsional)
 
-## Project Structure
+## Struktur Project
 
 ```
 src/main/java/com/boilerplate/
@@ -27,16 +26,16 @@ src/main/java/com/boilerplate/
     └── security/       → JWT, SecurityConfig, filters
 ```
 
-## Getting Started
+## Cara Menjalankan
 
 ### 1. Setup environment
 
 ```bash
 cp .env.example .env
-# Edit .env sesuai kebutuhan
+# Sesuaikan isi .env
 ```
 
-### 2. Jalankan Postgres via Docker (optional | bisa docker bisa yg sudah terinstall pada pc / laptop)
+### 2. Jalankan Postgres (opsional, skip kalau sudah punya Postgres yg keinstall di lokal pribadi ya gaess!)
 
 ```bash
 docker compose up -d
@@ -48,7 +47,7 @@ docker compose up -d
 ./mvnw spring-boot:run
 ```
 
-### 4. Akses Swagger UI
+### 4. Swagger UI
 
 ```
 http://localhost:8080/swagger-ui.html
@@ -70,7 +69,7 @@ http://localhost:8080/swagger-ui.html
 | GET | /api/v1/users/profile | Get current user profile |
 | GET | /api/v1/users/{id} | Get user by ID |
 
-### Masterdata - Province ( role : Admin)
+### Masterdata - Province
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | /api/v1/masterdata/provinces | Get all provinces |
@@ -79,23 +78,41 @@ http://localhost:8080/swagger-ui.html
 | PUT | /api/v1/masterdata/provinces/{id} | Update province |
 | DELETE | /api/v1/masterdata/provinces/{id} | Soft delete province |
 
-### Masterdata - City (role : Admin)
+### Masterdata - City
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | /api/v1/masterdata/cities | Get all cities (optional: ?provinceId=) |
+| GET | /api/v1/masterdata/cities | Get all cities (opsional: ?provinceId=) |
 | GET | /api/v1/masterdata/cities/{id} | Get city by ID |
 | POST | /api/v1/masterdata/cities | Create city |
 | PUT | /api/v1/masterdata/cities/{id} | Update city |
 | DELETE | /api/v1/masterdata/cities/{id} | Soft delete city |
 
+## CORS & Note (jika ingin coba di local pribadi dan integrasi ke FE)
+
+Konfigurasi CORS ada di `SecurityConfig.java`. Allowed origins dibaca dari env var `CORS_ALLOWED_ORIGINS`, default sudah di-set ke `http://localhost:5173` (Vite default port).
+
+Kalau FE jalan di port lain, set di `.env`:
+
+```env
+CORS_ALLOWED_ORIGINS=http://localhost:3000
+```
+
+Multiple origins dipisah koma:
+
+```env
+CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+```
+
+## FYI : Kalau FE pakai axios dengan `baseURL` langsung ke `http://localhost:8080`, CORS check aktif dari browser — pastikan origin FE sudah terdaftar. Kalau FE pakai Vite proxy (`/api` → `localhost:8080`), CORS tidak diperlukan.
+
 ## Environment Variables
 
-Lihat `.env.example` untuk daftar lengkap environment variables yang dibutuhkan.
+Lihat `.env.example` untuk daftar lengkap.
 
-## Running Tests
+## Testing (OPSIONAL tapi bagus di lakuin wkwkwk!)
 
 ```bash
 ./mvnw test
 ```
 
-## fyi : Integration test menggunakan Testcontainers, pastikan Docker Desktop berjalan.
+Integration test pakai Testcontainers — Docker harus jalan kalau mau jalanin test ini. Untuk development biasa tidak perlu.

@@ -275,3 +275,67 @@ module/user/
 - Controller → inject **interface** (UserService, AuthService)
 - Modul lain → inject **UserApi** (bukan UserService)
 - Tidak ada modul yang boleh import langsung ke `*ServiceImpl`
+
+---
+
+## Jackson Naming Strategy — camelCase vs snake_case
+
+### Masalah Klasik
+
+Java pakai **camelCase** untuk nama field, tapi JSON response bisa camelCase atau snake_case tergantung konvensi tim/API.
+
+```java
+// Java field
+private String fullName;
+private Instant createdAt;
+```
+
+```json
+// Default Jackson output (camelCase)
+{ "fullName": "John Doe", "createdAt": "..." }
+
+// Kalau pakai SNAKE_CASE
+{ "full_name": "John Doe", "created_at": "..." }
+```
+
+### Config Global — Cukup Satu Baris
+
+Jackson otomatis konversi **semua field** tanpa perlu annotasi satu per satu.
+
+**application.yml**
+```yaml
+spring:
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+```
+
+**application.properties**
+```properties
+spring.jackson.property-naming-strategy=SNAKE_CASE
+```
+
+### Pilihan Naming Strategy
+
+| Strategy | Java field | JSON output |
+|---|---|---|
+| `LOWER_CAMEL_CASE` | `fullName` | `fullName` (default) |
+| `SNAKE_CASE` | `fullName` | `full_name` |
+| `UPPER_CAMEL_CASE` | `fullName` | `FullName` |
+| `KEBAB_CASE` | `fullName` | `full-name` |
+| `LOWER_CASE` | `fullName` | `fullname` |
+
+### Rekomendasi
+
+- **Spring + React/TypeScript** → `LOWER_CAMEL_CASE` (default) karena JavaScript native-nya camelCase
+- **Spring + Python/Ruby client** → `SNAKE_CASE`
+- **Public API** → ikuti konvensi yang sudah ada, dokumentasikan di Swagger
+
+> Yang paling penting: **pilih satu, konsisten di seluruh project.** Jangan campur camelCase dan snake_case di response yang sama.
+
+### Darimana Aturan Ini?
+
+Ini bawaan **Jackson** (`com.fasterxml.jackson.databind.PropertyNamingStrategies`), bukan Spring Boot. Spring Boot hanya expose config-nya lewat `application.yml` via `spring.jackson.*` sehingga tidak perlu setup Jackson bean manual di Java code.
+
+Referensi:
+- Jackson docs → `PropertyNamingStrategies`
+- Spring Boot docs → Application Properties, section `spring.jackson.*`

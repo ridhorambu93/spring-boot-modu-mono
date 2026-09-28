@@ -94,7 +94,8 @@ public class BankingUserServiceImpl implements BankingUserService {
             bankingUser.getEmail(),
             bankingUser.getIdentityNumber(),
             bankingUser.getPhoneNumber(),
-            bankingUser.getStatus(),
+            // valueOf get from Enum DTO
+            BankingUserResponse.Status.valueOf(bankingUser.getStatus().name()),
             bankingUser.getCreatedAt(),
             bankingUser.getUpdatedAt()
         );

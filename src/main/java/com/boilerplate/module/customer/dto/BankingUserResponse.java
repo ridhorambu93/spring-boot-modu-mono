@@ -1,9 +1,8 @@
 package com.boilerplate.module.customer.dto;
 
-import com.boilerplate.module.customer.entity.BankingUser;
-
 import java.time.Instant;
 import java.util.UUID;
+
 
 public record BankingUserResponse(
     UUID id,
@@ -11,7 +10,13 @@ public record BankingUserResponse(
     String email,
     String identityNumber,
     String phoneNumber,
-    BankingUser.Status status,
+    Status status,
     Instant createdAt,
     Instant updatedAt
-) {}
+) {
+
+    public enum Status {
+        ACTIVE, INACTIVE, BLOCKED
+
+    }
+}

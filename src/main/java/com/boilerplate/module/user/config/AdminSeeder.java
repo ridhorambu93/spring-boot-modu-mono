@@ -1,4 +1,4 @@
-package com.boilerplate.infrastructure.config;
+package com.boilerplate.module.user.config;
 
 import com.boilerplate.module.user.entity.User;
 import com.boilerplate.module.user.repository.UserRepository;

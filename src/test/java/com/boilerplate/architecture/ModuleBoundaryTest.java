@@ -31,22 +31,27 @@ class ModuleBoundaryTest {
     @ArchTest
     static final ArchRule modulesMustDependOnlyOnOtherModulesPublicContracts =
         classes()
-            .that().resideInAPackage("com.boilerplate.module..")
-            .should(new ArchCondition<>("depend only on public contract packages of other modules") {
+            .that().resideInAPackage("com.boilerplate..")
+            .should(new ArchCondition<>("depend only on public contracts and keep internals private") {
                 @Override
                 public void check(JavaClass sourceClass, ConditionEvents events) {
                     String sourceModule = moduleName(sourceClass.getPackageName());
-                    if (sourceModule == null) {
-                        return;
-                    }
 
                     for (Dependency dependency : sourceClass.getDirectDependenciesFromSelf()) {
                         JavaClass targetClass = dependency.getTargetClass();
                         String targetModule = moduleName(targetClass.getPackageName());
 
+                        boolean accessFromOutsideOrAnotherModule =
+                            sourceModule == null || !sourceModule.equals(targetModule);
+
+                        boolean contractAccessingItsOwnInternalPackage = sourceModule != null
+                            && sourceModule.equals(targetModule)
+                            && isPublicContractPackage(sourceClass.getPackageName(), sourceModule);
+
                         if (targetModule != null
-                            && !sourceModule.equals(targetModule)
-                            && isInternalPackage(targetClass.getPackageName(), targetModule)) {
+                            && isInternalPackage(targetClass.getPackageName(), targetModule)
+                            && (accessFromOutsideOrAnotherModule
+                                || contractAccessingItsOwnInternalPackage)) {
                             events.add(SimpleConditionEvent.violated(
                                 dependency,
                                 dependency.getDescription()
@@ -73,6 +78,23 @@ class ModuleBoundaryTest {
         String moduleAndPackage = packageName.substring(MODULE_PACKAGE_PREFIX.length());
         int separator = moduleAndPackage.indexOf('.');
         return separator < 0 ? moduleAndPackage : moduleAndPackage.substring(0, separator);
+    }
+
+    // check for valid contract (folder nya harus api, dto atau domain-dto)
+    private static boolean isPublicContractPackage(String packageName, String moduleName) {
+        String moduleRoot = MODULE_PACKAGE_PREFIX + moduleName;
+        String modulePackage = moduleRoot + ".";
+
+        if (!packageName.startsWith(modulePackage)) {
+            return false;
+        }
+
+        String moduleRelativePackage = packageName.substring(modulePackage.length());
+
+        return PUBLIC_CONTRACT_PACKAGES.stream().anyMatch(contractPackage ->
+            moduleRelativePackage.equals(contractPackage)
+                || moduleRelativePackage.startsWith(contractPackage + ".")
+        );
     }
 
     private static boolean isInternalPackage(String packageName, String moduleName) {

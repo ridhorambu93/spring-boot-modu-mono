@@ -5,9 +5,14 @@ spring:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   datasource:
   # sesuaikan dengan nama db, user dan pass postgres kalian ges!
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:boilerplate_db}
-    username: ${DB_USER:boilerplate_user}
-    password: ${DB_PASSWORD:boilerplate_pass}
+    # url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:boilerplate_db}
+    # username: ${DB_USER:boilerplate_user}
+    # password: ${DB_PASSWORD:boilerplate_pass}
+
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:db-spring-service-modumono}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -42,7 +47,7 @@ springdoc:
 app:
   jwt:
     secret: ${JWT_SECRET:default-secret-change-in-production-min-256-bit}
-    expiration-ms: ${JWT_EXPIRATION_MS:120000}
+    expiration-ms: ${JWT_EXPIRATION_MS:1200000}
     refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}
   admin:
     email: ${ADMIN_EMAIL:admin@example.com}

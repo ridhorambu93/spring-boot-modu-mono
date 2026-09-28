@@ -69,6 +69,15 @@ http://localhost:8080/swagger-ui.html
 | GET | /api/v1/users/profile | Get current user profile |
 | GET | /api/v1/users/{id} | Get user by ID |
 
+### Banking Customer
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | /api/v1/customers | Get all banking customers |
+| GET | /api/v1/customers/{id} | Get banking customer by ID |
+| POST | /api/v1/customers | Create banking customer (Admin only) |
+| PUT | /api/v1/customers/{id} | Update banking customer (Admin only) |
+| DELETE | /api/v1/customers/{id} | Soft delete banking customer (Admin only) |
+
 ### Masterdata - Province
 | Method | Path | Description |
 |--------|------|-------------|
